@@ -81,13 +81,15 @@ class MongoDB(object):
                 primary_optime=None
                 secondary=1
 
+                member_count=1
                 for member in members:
                     if member['stateStr'] == 'PRIMARY' : 
                         primary_optime =member['optimeDate']
                         if not primary_optime:
-                            continue
+                            break
                             
                     if member['stateStr'] == 'SECONDARY' :
+                        member_count+=1
                         secondary_optime = member['optimeDate']
                         metric_name='Repl_lag_'+member['name']
                         if secondary_optime:
@@ -95,8 +97,9 @@ class MongoDB(object):
                             secondary+=1
                         else:
                             continue
-                            
+                    
                         METRICS_UNITS['Repl_lag_'+member['name']]="sec"
+                data['member_count']=member_count
             
                 self.connection.close()
 
