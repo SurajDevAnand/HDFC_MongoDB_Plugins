@@ -87,16 +87,16 @@ class MongoDB(object):
                         primary_optime =member['optimeDate']
                         if not primary_optime:
                             break
-                            
-                    if member['stateStr'] == 'SECONDARY' :
-                        member_count+=1
-                        secondary_optime = member['optimeDate']
-                        metric_name='Repl_lag_'+member['name']
-                        if secondary_optime:
-                            data[metric_name]=(primary_optime - secondary_optime).total_seconds()
-                            secondary+=1
-                        else:
-                            continue
+                    if not primary_optime :
+                        if member['stateStr'] == 'SECONDARY' :
+                            member_count+=1
+                            secondary_optime = member['optimeDate']
+                            metric_name='Repl_lag_'+member['name']
+                            if secondary_optime:
+                                data[metric_name]=(primary_optime - secondary_optime).total_seconds()
+                                secondary+=1
+                            else:
+                                continue
                     
                         METRICS_UNITS['Repl_lag_'+member['name']]="sec"
                 data['member_count']=member_count
