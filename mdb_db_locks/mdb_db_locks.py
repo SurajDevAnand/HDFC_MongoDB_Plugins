@@ -84,6 +84,7 @@ class MongoDB(object):
                             i+=1
                         if i>10:
                             break
+                    data['locks_count']=i-1
                     if i<10:
                         k=i
                         for j in range(11-i):
