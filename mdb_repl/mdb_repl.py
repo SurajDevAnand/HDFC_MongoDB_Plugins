@@ -87,7 +87,7 @@ class MongoDB(object):
                         primary_optime =member['optimeDate']
                         if not primary_optime:
                             break
-                    if not primary_optime :
+                    if primary_optime :
                         if member['stateStr'] == 'SECONDARY' :
                             member_count+=1
                             secondary_optime = member['optimeDate']
