@@ -84,10 +84,17 @@ class MongoDB(object):
                 for member in members:
                     if member['stateStr'] == 'PRIMARY' : 
                         primary_optime =member['optimeDate']
+                        if not primary_optime:
+                            continue
+                            
                     if member['stateStr'] == 'SECONDARY' :
                         secondary_optime = member['optimeDate']
                         metric_name='Repl_lag_'+member['name']
-                        data[metric_name]=(primary_optime - secondary_optime).total_seconds()
+                        if secondary_optime:
+                            data[metric_name]=(primary_optime - secondary_optime).total_seconds()
+                        else:
+                            continue
+
                         secondary+=1
                         METRICS_UNITS['Repl_lag_'+member['name']]="sec"
             
@@ -116,7 +123,7 @@ if __name__ == "__main__":
 
 
     host ="127.0.0.1"
-    port ="27083"
+    port ="27081"
     username ="None"
     password ="None"
     dbname ="admin"
