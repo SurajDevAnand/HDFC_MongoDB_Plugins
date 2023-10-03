@@ -92,10 +92,10 @@ class MongoDB(object):
                         metric_name='Repl_lag_'+member['name']
                         if secondary_optime:
                             data[metric_name]=(primary_optime - secondary_optime).total_seconds()
+                            secondary+=1
                         else:
                             continue
-
-                        secondary+=1
+                            
                         METRICS_UNITS['Repl_lag_'+member['name']]="sec"
             
                 self.connection.close()
