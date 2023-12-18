@@ -78,30 +78,18 @@ class MongoDB(object):
                 replication_data = db.command({'replSetGetStatus'  :1})
                 
                 members=replication_data['members']
-                primary_optime=None
-                secondary=1
-
-                member_count=1
-                for member in members:
-                    if member['stateStr'] == 'PRIMARY' : 
-                        primary_optime =member['optimeDate']
-                        if not primary_optime:
-                            break
-                    if primary_optime :
-                        if member['stateStr'] == 'SECONDARY' :
-                            member_count+=1
-                            secondary_optime = member['optimeDate']
+                primary_replica=members[0]
+                primary_optime=primary_replica["optimeDate"]
+                if primary_optime:
+                    for member in members:
+                        if member["stateStr"]=="SECONDARY":
+                            secondary_optime=member['optimeDate']
                             metric_name='Repl_lag_'+member['name']
-                            if secondary_optime:
-                                data[metric_name]=(primary_optime - secondary_optime).total_seconds()
-                                secondary+=1
-                            else:
-                                continue
-                    
-                        METRICS_UNITS['Repl_lag_'+member['name']]="sec"
-                data['member_count']=member_count
-            
+                            data[metric_name]=(primary_optime-secondary_optime).total_seconds()
+                            METRICS_UNITS[metric_name]="sec"
+
                 self.connection.close()
+
 
             except pymongo.errors.ServerSelectionTimeoutError as e:
                 data['status']=0
